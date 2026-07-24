@@ -1,4 +1,5 @@
 using asistenciaBack.Identity.Domain.Entities;
+using asistenciaBack.Membership.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace asistenciaBack.Database;
@@ -11,6 +12,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<Member> Members => Set<Member>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

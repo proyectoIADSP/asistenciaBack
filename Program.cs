@@ -1,10 +1,12 @@
 using asistenciaBack.Identity.Presentation;
+using asistenciaBack.Membership.Presentation;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddMembershipModule();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -13,7 +15,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Asistencia API",
         Version = "v1",
-        Description = "API de asistencia eclesiástica — Identity (login JWT)"
+        Description = "API de asistencia eclesiástica — Identity + Membership"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
