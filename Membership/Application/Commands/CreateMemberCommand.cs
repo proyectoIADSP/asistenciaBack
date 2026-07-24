@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using asistenciaBack.Membership.Application;
 using asistenciaBack.Membership.Application.Dtos;
 using asistenciaBack.Membership.Application.Interfaces;
@@ -8,6 +9,8 @@ namespace asistenciaBack.Membership.Application.Commands;
 
 public class CreateMemberCommand
 {
+    private static readonly Regex NineDigitPhone = new(@"^\d{9}$", RegexOptions.Compiled);
+
     private readonly IMemberRepository _members;
 
     public CreateMemberCommand(IMemberRepository members)
@@ -25,11 +28,21 @@ public class CreateMemberCommand
             return Result.Failure<MemberDto>(validationError);
         }
 
-        var member = Member.Create(
-            request.FirstName,
-            request.LastName,
-            request.PhoneNumber,
-            request.Address);
+        var firstName = request.FirstName.Trim();
+        var lastName = request.LastName.Trim();
+        var phone = request.PhoneNumber.Trim();
+
+        if (await _members.ExistsByFullNameAsync(firstName, lastName, cancellationToken))
+        {
+            return Result.Failure<MemberDto>("Ese miembro ya está registrado con ese nombre y apellido.");
+        }
+
+        if (await _members.ExistsByPhoneNumberAsync(phone, cancellationToken))
+        {
+            return Result.Failure<MemberDto>("Ese número de celular ya está registrado.");
+        }
+
+        var member = Member.Create(firstName, lastName, phone, request.Address);
 
         await _members.AddAsync(member, cancellationToken);
         await _members.SaveChangesAsync(cancellationToken);
@@ -41,37 +54,37 @@ public class CreateMemberCommand
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {
-            return "First name is required.";
+            return "El nombre es obligatorio.";
         }
 
         if (firstName.Trim().Length > 50)
         {
-            return "First name must be at most 50 characters.";
+            return "El nombre debe tener máximo 50 caracteres.";
         }
 
         if (string.IsNullOrWhiteSpace(lastName))
         {
-            return "Last name is required.";
+            return "El apellido es obligatorio.";
         }
 
         if (lastName.Trim().Length > 50)
         {
-            return "Last name must be at most 50 characters.";
+            return "El apellido debe tener máximo 50 caracteres.";
         }
 
         if (string.IsNullOrWhiteSpace(phoneNumber))
         {
-            return "Phone number is required.";
+            return "El número de celular es obligatorio.";
         }
 
-        if (phoneNumber.Trim().Length > 20)
+        if (!NineDigitPhone.IsMatch(phoneNumber.Trim()))
         {
-            return "Phone number must be at most 20 characters.";
+            return "El número de celular debe tener exactamente 9 dígitos.";
         }
 
         if (address is not null && address.Trim().Length > 150)
         {
-            return "Address must be at most 150 characters.";
+            return "La dirección debe tener máximo 150 caracteres.";
         }
 
         return null;

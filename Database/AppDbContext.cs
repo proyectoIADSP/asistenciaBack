@@ -1,3 +1,4 @@
+using asistenciaBack.Attendance.Domain.Entities;
 using asistenciaBack.Identity.Domain.Entities;
 using asistenciaBack.Membership.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

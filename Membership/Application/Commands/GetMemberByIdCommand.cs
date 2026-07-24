@@ -21,7 +21,7 @@ public class GetMemberByIdCommand
         var member = await _members.GetByIdAsync(id, cancellationToken);
         if (member is null || !member.IsActive)
         {
-            return Result.Failure<MemberDto>("Member not found.");
+            return Result.Failure<MemberDto>("Miembro no encontrado.");
         }
 
         return Result.Success(member.ToDto());

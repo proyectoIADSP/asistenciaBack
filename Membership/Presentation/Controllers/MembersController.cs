@@ -75,7 +75,7 @@ public class MembersController : ControllerBase
         var result = await _updateMember.ExecuteAsync(id, request, cancellationToken);
         if (!result.IsSuccess)
         {
-            return result.Error == "Member not found."
+            return result.Error == "Miembro no encontrado."
                 ? NotFound(new { error = result.Error })
                 : BadRequest(new { error = result.Error });
         }
@@ -90,7 +90,7 @@ public class MembersController : ControllerBase
         var result = await _deactivateMember.ExecuteAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            return result.Error == "Member not found."
+            return result.Error == "Miembro no encontrado."
                 ? NotFound(new { error = result.Error })
                 : BadRequest(new { error = result.Error });
         }
@@ -105,7 +105,7 @@ public class MembersController : ControllerBase
         var result = await _activateMember.ExecuteAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            return result.Error == "Member not found."
+            return result.Error == "Miembro no encontrado."
                 ? NotFound(new { error = result.Error })
                 : BadRequest(new { error = result.Error });
         }

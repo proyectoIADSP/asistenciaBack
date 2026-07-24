@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using asistenciaBack.Identity.Application.Dtos;
 using asistenciaBack.Identity.Application.Interfaces;
 using asistenciaBack.Identity.Domain.Entities;
@@ -8,6 +9,10 @@ namespace asistenciaBack.Identity.Application.Commands;
 
 public class RegisterCommand
 {
+    private static readonly Regex EmailRegex = new(
+        @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     private readonly IUserRepository _users;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenService _jwtTokenService;
@@ -33,6 +38,13 @@ public class RegisterCommand
             return Result.Failure<AuthResponse>("Nombre, email y contraseña son obligatorios.");
         }
 
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (!EmailRegex.IsMatch(email))
+        {
+            return Result.Failure<AuthResponse>("El formato del email no es válido.");
+        }
+
         if (request.Password.Length < 6)
         {
             return Result.Failure<AuthResponse>("La contraseña debe tener al menos 6 caracteres.");
@@ -44,13 +56,13 @@ public class RegisterCommand
             return Result.Failure<AuthResponse>("Rol inválido. Use Deacon o Administrator.");
         }
 
-        if (await _users.ExistsByEmailAsync(request.Email, cancellationToken))
+        if (await _users.ExistsByEmailAsync(email, cancellationToken))
         {
-            return Result.Failure<AuthResponse>("Ya existe un usuario con ese email.");
+            return Result.Failure<AuthResponse>("Ese email ya está registrado.");
         }
 
         var passwordHash = _passwordHasher.Hash(request.Password);
-        var user = User.Create(request.FullName, request.Email, passwordHash, request.Role);
+        var user = User.Create(request.FullName, email, passwordHash, request.Role);
 
         await _users.AddAsync(user, cancellationToken);
         await _users.SaveChangesAsync(cancellationToken);

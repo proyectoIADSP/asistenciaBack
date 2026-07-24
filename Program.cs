@@ -1,3 +1,4 @@
+using asistenciaBack.Attendance.Presentation;
 using asistenciaBack.Identity.Presentation;
 using asistenciaBack.Membership.Presentation;
 using Microsoft.OpenApi;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddMembershipModule();
+builder.Services.AddAttendanceModule();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -15,7 +17,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Asistencia API",
         Version = "v1",
-        Description = "API de asistencia eclesiástica — Identity + Membership"
+        Description = "API de asistencia eclesiástica — Identity + Membership + Attendance"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

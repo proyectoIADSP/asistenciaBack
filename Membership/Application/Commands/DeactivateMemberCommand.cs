@@ -19,12 +19,12 @@ public class DeactivateMemberCommand
         var member = await _members.GetByIdAsync(id, cancellationToken);
         if (member is null)
         {
-            return Result.Failure<MemberDto>("Member not found.");
+            return Result.Failure<MemberDto>("Miembro no encontrado.");
         }
 
         if (!member.IsActive)
         {
-            return Result.Failure<MemberDto>("Member is already inactive.");
+            return Result.Failure<MemberDto>("El miembro ya está inactivo.");
         }
 
         member.Deactivate();

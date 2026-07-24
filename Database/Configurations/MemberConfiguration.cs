@@ -24,7 +24,7 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
             .IsRequired();
 
         builder.Property(x => x.PhoneNumber)
-            .HasMaxLength(20)
+            .HasMaxLength(9)
             .IsRequired();
 
         builder.Property(x => x.Address)
@@ -37,5 +37,11 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
             .IsRequired();
 
         builder.HasIndex(x => x.IsActive);
+
+        builder.HasIndex(x => x.PhoneNumber)
+            .IsUnique();
+
+        builder.HasIndex(x => new { x.FirstName, x.LastName })
+            .IsUnique();
     }
 }
