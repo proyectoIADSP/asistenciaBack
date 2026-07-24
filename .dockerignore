@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/.git/
+**/.vs/
+**/publish/
+**/asistencia.db*
+**/appsettings.Development.json
+**/.env
+**/Properties/PublishProfiles/
