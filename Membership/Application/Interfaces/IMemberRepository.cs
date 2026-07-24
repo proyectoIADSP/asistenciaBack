@@ -5,6 +5,8 @@ namespace asistenciaBack.Membership.Application.Interfaces;
 public interface IMemberRepository
 {
     Task<IReadOnlyList<Member>> GetAllActiveAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Member>> GetAllInactiveAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Member>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Member?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByFullNameAsync(
         string firstName,

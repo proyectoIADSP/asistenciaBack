@@ -11,6 +11,7 @@ namespace asistenciaBack.Membership.Presentation.Controllers;
 public class MembersController : ControllerBase
 {
     private readonly GetMembersCommand _getMembers;
+    private readonly GetInactiveMembersCommand _getInactiveMembers;
     private readonly GetMemberByIdCommand _getMemberById;
     private readonly CreateMemberCommand _createMember;
     private readonly UpdateMemberCommand _updateMember;
@@ -19,6 +20,7 @@ public class MembersController : ControllerBase
 
     public MembersController(
         GetMembersCommand getMembers,
+        GetInactiveMembersCommand getInactiveMembers,
         GetMemberByIdCommand getMemberById,
         CreateMemberCommand createMember,
         UpdateMemberCommand updateMember,
@@ -26,6 +28,7 @@ public class MembersController : ControllerBase
         ActivateMemberCommand activateMember)
     {
         _getMembers = getMembers;
+        _getInactiveMembers = getInactiveMembers;
         _getMemberById = getMemberById;
         _createMember = createMember;
         _updateMember = updateMember;
@@ -33,10 +36,21 @@ public class MembersController : ControllerBase
         _activateMember = activateMember;
     }
 
+    /// <summary>Lista miembros activos. Con includeInactive=true devuelve activos + inactivos.</summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] bool includeInactive,
+        CancellationToken cancellationToken)
     {
-        var result = await _getMembers.ExecuteAsync(cancellationToken);
+        var result = await _getMembers.ExecuteAsync(includeInactive, cancellationToken);
+        return Ok(result.Value);
+    }
+
+    /// <summary>Lista solo los miembros inactivos (IsActive = false).</summary>
+    [HttpGet("inactive")]
+    public async Task<IActionResult> GetInactive(CancellationToken cancellationToken)
+    {
+        var result = await _getInactiveMembers.ExecuteAsync(cancellationToken);
         return Ok(result.Value);
     }
 

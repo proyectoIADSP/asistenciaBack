@@ -5,22 +5,19 @@ using asistenciaBack.Shared.Results;
 
 namespace asistenciaBack.Membership.Application.Commands;
 
-public class GetMembersCommand
+public class GetInactiveMembersCommand
 {
     private readonly IMemberRepository _members;
 
-    public GetMembersCommand(IMemberRepository members)
+    public GetInactiveMembersCommand(IMemberRepository members)
     {
         _members = members;
     }
 
     public async Task<Result<IReadOnlyList<MemberDto>>> ExecuteAsync(
-        bool includeInactive = false,
         CancellationToken cancellationToken = default)
     {
-        var members = includeInactive
-            ? await _members.GetAllAsync(cancellationToken)
-            : await _members.GetAllActiveAsync(cancellationToken);
+        var members = await _members.GetAllInactiveAsync(cancellationToken);
         var dtos = members.Select(m => m.ToDto()).ToList();
         return Result.Success<IReadOnlyList<MemberDto>>(dtos);
     }

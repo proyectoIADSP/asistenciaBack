@@ -24,6 +24,25 @@ public class MemberRepository : IMemberRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Member>> GetAllInactiveAsync(CancellationToken cancellationToken = default)
+    {
+        return await _db.Members
+            .AsNoTracking()
+            .Where(m => !m.IsActive)
+            .OrderBy(m => m.LastName)
+            .ThenBy(m => m.FirstName)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Member>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _db.Members
+            .AsNoTracking()
+            .OrderBy(m => m.LastName)
+            .ThenBy(m => m.FirstName)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<Member?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
         _db.Members.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
 

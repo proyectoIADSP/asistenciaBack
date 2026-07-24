@@ -10,6 +10,7 @@ public static class MembershipDependencyInjection
     {
         services.AddScoped<IMemberRepository, MemberRepository>();
         services.AddScoped<GetMembersCommand>();
+        services.AddScoped<GetInactiveMembersCommand>();
         services.AddScoped<GetMemberByIdCommand>();
         services.AddScoped<CreateMemberCommand>();
         services.AddScoped<UpdateMemberCommand>();

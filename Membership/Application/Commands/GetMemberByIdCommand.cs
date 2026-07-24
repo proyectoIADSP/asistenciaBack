@@ -18,8 +18,9 @@ public class GetMemberByIdCommand
         int id,
         CancellationToken cancellationToken = default)
     {
+        // No se filtra por IsActive: el detalle debe poder consultarse aunque esté inactivo.
         var member = await _members.GetByIdAsync(id, cancellationToken);
-        if (member is null || !member.IsActive)
+        if (member is null)
         {
             return Result.Failure<MemberDto>("Miembro no encontrado.");
         }
