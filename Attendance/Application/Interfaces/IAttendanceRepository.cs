@@ -8,7 +8,13 @@ public interface IAttendanceRepository
         DateOnly date,
         CancellationToken cancellationToken = default);
 
-    Task UpsertBulkAsync(
+    Task<IReadOnlyList<int>> GetExistingMemberIdsForDateAsync(
+        DateOnly date,
+        IReadOnlyCollection<int> memberIds,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Inserta registros nuevos. No actualiza existentes.</summary>
+    Task InsertBulkAsync(
         IReadOnlyList<AttendanceRecord> records,
         CancellationToken cancellationToken = default);
 

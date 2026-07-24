@@ -46,6 +46,11 @@ public class AttendanceController : ControllerBase
     public async Task<IActionResult> GetByDate(DateOnly date, CancellationToken cancellationToken)
     {
         var result = await _getByDate.ExecuteAsync(date, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
         return Ok(result.Value);
     }
 

@@ -1,4 +1,5 @@
 using asistenciaBack.Attendance.Application.Interfaces;
+using asistenciaBack.Attendance.Domain;
 using asistenciaBack.Attendance.Domain.Entities;
 using asistenciaBack.Attendance.Domain.Enums;
 using asistenciaBack.Database;
@@ -26,7 +27,24 @@ public class AttendanceRepository : IAttendanceRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpsertBulkAsync(
+    public async Task<IReadOnlyList<int>> GetExistingMemberIdsForDateAsync(
+        DateOnly date,
+        IReadOnlyCollection<int> memberIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (memberIds.Count == 0)
+        {
+            return Array.Empty<int>();
+        }
+
+        return await _db.AttendanceRecords
+            .AsNoTracking()
+            .Where(r => r.Date == date && memberIds.Contains(r.MemberId))
+            .Select(r => r.MemberId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task InsertBulkAsync(
         IReadOnlyList<AttendanceRecord> records,
         CancellationToken cancellationToken = default)
     {
@@ -35,26 +53,7 @@ public class AttendanceRepository : IAttendanceRepository
             return;
         }
 
-        var date = records[0].Date;
-        var memberIds = records.Select(r => r.MemberId).ToList();
-
-        var existing = await _db.AttendanceRecords
-            .Where(r => r.Date == date && memberIds.Contains(r.MemberId))
-            .ToListAsync(cancellationToken);
-
-        var existingByMemberId = existing.ToDictionary(r => r.MemberId);
-
-        foreach (var incoming in records)
-        {
-            if (existingByMemberId.TryGetValue(incoming.MemberId, out var current))
-            {
-                current.Update(incoming.Status, incoming.RegisteredByUserId, incoming.Notes);
-            }
-            else
-            {
-                await _db.AttendanceRecords.AddAsync(incoming, cancellationToken);
-            }
-        }
+        await _db.AttendanceRecords.AddRangeAsync(records, cancellationToken);
     }
 
     public async Task<IReadOnlyList<(int MemberId, int Present, int Late, int Absent)>> GetMonthlyStatsAsync(
@@ -62,12 +61,15 @@ public class AttendanceRepository : IAttendanceRepository
         int month,
         CancellationToken cancellationToken = default)
     {
-        var start = new DateOnly(year, month, 1);
-        var end = start.AddMonths(1);
+        var saturdays = SaturdayCalendar.GetSaturdaysInMonth(year, month);
+        if (saturdays.Count == 0)
+        {
+            return Array.Empty<(int, int, int, int)>();
+        }
 
         var rows = await _db.AttendanceRecords
             .AsNoTracking()
-            .Where(r => r.Date >= start && r.Date < end)
+            .Where(r => saturdays.Contains(r.Date))
             .GroupBy(r => r.MemberId)
             .Select(g => new
             {

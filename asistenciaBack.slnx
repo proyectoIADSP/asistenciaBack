@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/asistenciaBack.Tests/asistenciaBack.Tests.csproj" />
+  </Folder>
   <Project Path="asistenciaBack.csproj" />
 </Solution>

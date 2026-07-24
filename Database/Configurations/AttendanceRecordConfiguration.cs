@@ -23,9 +23,9 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
         builder.Property(x => x.Date)
             .IsRequired();
 
+        // Persistido como entero: Present=1, Late=2, Absent=3
         builder.Property(x => x.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20)
+            .HasConversion<int>()
             .IsRequired();
 
         builder.Property(x => x.Notes)
