@@ -54,7 +54,8 @@ if (enableSwagger)
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Asistencia API v1");
+        // Ruta relativa: evita bucle de redirect detrás del proxy de Render.
+        options.SwaggerEndpoint("v1/swagger.json", "Asistencia API v1");
         options.RoutePrefix = "swagger";
     });
 }
